@@ -16,7 +16,7 @@ public class MyImage
         Texture = new NativeLibrary.MyColor[textureWidth * textureHeight]; 
     }
 
-    public void Save(string filePath)
+    public void Save(string filePath, NativeLibrary.TryReportCallback callback)
     {
         string? directoryPath = Path.GetDirectoryName(filePath);
         if (!string.IsNullOrEmpty(directoryPath))
@@ -35,5 +35,7 @@ public class MyImage
             
             image.Save(filePath);
         }
+        
+        callback(1.0f);
     }
 }

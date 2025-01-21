@@ -32,10 +32,12 @@ internal partial class Program
         // ---------------------------------------------------------
         
         List<Command> commandChain = new List<Command> {
-            new Command(Command.CommandNameEnum.Generate, new string[] { "1", "1024", "1024" }),
+            new Command(Command.CommandNameEnum.Generate, new string[] { "1", "2048", "2048" }),
             new Command(Command.CommandNameEnum.Output, new string[] { "executor1" }),
             new Command(Command.CommandNameEnum.Blur, new string[] { "100", "100" }),
             new Command(Command.CommandNameEnum.Output, new string[] { "executor2" }),
+            new Command(Command.CommandNameEnum.Blur, new string[] { "100", "100" }),
+            new Command(Command.CommandNameEnum.Output, new string[] { "executor3" }),
         };
         
         Executor executor = new();
