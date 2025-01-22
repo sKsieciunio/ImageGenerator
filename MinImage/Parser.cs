@@ -1,32 +1,56 @@
 ﻿namespace MinImage;
 
+public class InvalidSyntaxException : Exception
+{
+    public InvalidSyntaxException(string message) : base(message) { }
+}
+
 public static class Parser
 {
-    // public static Command ParseCommand(string input)
-    // {
-    //     string[] parts = input.Split('|', StringSplitOptions.TrimEntries);
-    //     Command command = new();
-    //     SingleCommand.CommandType type = SingleCommand.CommandType.Generate;
-    //     
-    //     if (parts.Length == 0)
-    //     {
-    //         return command;
-    //     }
-    //
-    //     if (parts[0] == "generate")
-    //     {
-    //         type = SingleCommand.CommandType.Generate;
-    //     }
-    //     else if (parts[0] == "process")
-    //     {
-    //         type = SingleCommand.CommandType.Process;
-    //     }
-    //     else if (parts[0] == "save")
-    //     {
-    //         type = SingleCommand.CommandType.Save;
-    //     }
-    //
-    //     command.Commands.Add(new SingleCommand(parts[0], parts[1..], type));
-    //     return command;
-    // } 
+    public static List<Command> ParseCommand(string command)
+    {
+        List<Command> commandChain = new();
+        
+        string[] commands = command.Split('|', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+        
+        if (commands.Length == 0)
+            throw new InvalidSyntaxException("Invalid syntax: no command provided.");
+        
+        // process first command, make sure its generative type
+        string[] parts = commands[0].Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+        
+        Command.CommandNameEnum commandName = parts[0].ToLower() switch
+        {
+            "generate" => Command.CommandNameEnum.Generate,
+            "input" => Command.CommandNameEnum.Input,
+            _ => throw new InvalidSyntaxException("Invalid syntax: first command must be generative type, see 'help' for more info.")
+        };
+        
+        string[] arguments = parts.Length > 1 ? parts[1..] : Array.Empty<string>();
+        commandChain.Add(new Command(commandName, arguments));
+        
+        // process the rest of the commands
+        for (int i = 1; i < commands.Length; i++)
+        {
+            parts = commands[i].Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+            
+            commandName = parts[0].ToLower() switch
+            {
+                "blur" => Command.CommandNameEnum.Blur,
+                "randomcircles" => Command.CommandNameEnum.RandomCircles,
+                "room" => Command.CommandNameEnum.Room,
+                "colorcorrection" => Command.CommandNameEnum.ColorCorrection,
+                "gammacorrection" => Command.CommandNameEnum.GammaCorrection,
+                "output" => Command.CommandNameEnum.Output,
+                "generate" or "input" => throw new InvalidSyntaxException("Invalid syntax: generative type command must be the first command."),
+                _ => throw new InvalidSyntaxException("Invalid syntax: unknown command.")
+            };
+            
+            // arguments = parts[1..];
+            arguments = parts.Length > 1 ? parts[1..] : Array.Empty<string>();
+            commandChain.Add(new Command(commandName, arguments));
+        }
+
+        return commandChain;
+    }
 }
