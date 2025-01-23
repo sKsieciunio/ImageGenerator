@@ -161,7 +161,8 @@ public static class Executor
                         throw new Exception("Unknown command");
                 }
 
-                _taskProgress[taskId].CurrentCommand++;
+                if (!_cts.IsCancellationRequested)
+                    _taskProgress[taskId].CurrentCommand++;
             }
         });
 
