@@ -20,18 +20,21 @@ public static class Executor
         
     public static void ExecuteCommandChain(List<Command> commandChain)
     {
-        int textureWidth;
-        int textureHeight;
-        
-        if (commandChain[0].CommandName == Command.CommandNameEnum.Generate)
+        int textureWidth = 0;
+        int textureHeight = 0;
+
+        switch (commandChain[0].CommandName)
         {
-            textureWidth = int.Parse(commandChain[0].Arguments[1]);
-            textureHeight = int.Parse(commandChain[0].Arguments[2]);
-            _imageCount = int.Parse(commandChain[0].Arguments[0]);
-        }
-        else
-        {
-            throw new Exception("First command must be 'generate'");
+            case Command.CommandNameEnum.Generate:
+                _imageCount = int.Parse(commandChain[0].Arguments[0]);
+                textureWidth = int.Parse(commandChain[0].Arguments[1]);
+                textureHeight = int.Parse(commandChain[0].Arguments[2]);
+                break;
+            case Command.CommandNameEnum.Input:
+                _imageCount = 1; 
+                break;
+            default:
+                throw new Exception("Invalid syntax: first command must be generative type, see 'help' for more info.");
         }
         
         MyImage[] images = new MyImage[_imageCount];
@@ -71,13 +74,39 @@ public static class Executor
                     case Command.CommandNameEnum.Generate:
                         NativeLibrary.GenerateImage(images[taskId], callback);
                         break;
+                    case Command.CommandNameEnum.Input:
+                        images[taskId].Load(command.Arguments[0], callback);
+                        break;
                     case Command.CommandNameEnum.Blur:
                         int w = int.Parse(command.Arguments[0]);
                         int h = int.Parse(command.Arguments[1]);
                         NativeLibrary.Blur(images[taskId], w, h, callback);
                         break;
+                    case Command.CommandNameEnum.ColorCorrection:
+                        float red = float.Parse(command.Arguments[0]);
+                        float green = float.Parse(command.Arguments[1]);
+                        float blue = float.Parse(command.Arguments[2]);
+                        NativeLibrary.ColorCorrection(images[taskId], red, green, blue, callback);
+                        break;
+                    case Command.CommandNameEnum.GammaCorrection:
+                        float gamma = float.Parse(command.Arguments[0]);
+                        NativeLibrary.GammaCorrection(images[taskId], gamma, callback);
+                        break;
+                    case Command.CommandNameEnum.RandomCircles:
+                        int circleCount = int.Parse(command.Arguments[0]);
+                        int circleRadius = int.Parse(command.Arguments[1]);
+                        NativeLibrary.RandomCircles(images[taskId], circleCount, circleRadius, callback);
+                        break;
+                    case Command.CommandNameEnum.Room:
+                        float x1 = float.Parse(command.Arguments[0]);
+                        float y1 = float.Parse(command.Arguments[1]);
+                        float x2 = float.Parse(command.Arguments[2]);
+                        float y2 = float.Parse(command.Arguments[3]);
+                        NativeLibrary.Room(images[taskId], x1, y1, x2, y2, callback);
+                        break;
                     case Command.CommandNameEnum.Output:
-                        images[taskId].Save("images/" + command.Arguments[0] + $"{taskId+1}.png", callback);
+                        string savePath = "images/" + command.Arguments[0] + (_imageCount > 1 ? $"{taskId+1}.png" : ".png");
+                        images[taskId].Save(savePath, callback);
                         break;
                     default:
                         throw new Exception("Unknown command");

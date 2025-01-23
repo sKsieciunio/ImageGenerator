@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Globalization;
+using System.Runtime.InteropServices;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 
@@ -19,6 +20,9 @@ internal class Program
             Console.WriteLine("Invalid usage: MinImage does not accept command line arguments.");
             return;
         }
+        
+        // required for proper float parsing
+        Thread.CurrentThread.CurrentCulture = CultureInfo.CreateSpecificCulture("en-US");
         
         TerminalSession terminal = new();
         terminal.Run();

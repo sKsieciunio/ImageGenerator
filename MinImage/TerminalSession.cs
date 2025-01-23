@@ -37,6 +37,18 @@ public class TerminalSession
                 {
                     Console.WriteLine(e.Message);
                 }
+                catch (AggregateException e)
+                {
+                    foreach (var innerEx in e.InnerExceptions)
+                        if (innerEx is IndexOutOfRangeException)
+                            Console.WriteLine("Invalid syntax: propably wrong amount of arguments.");
+                        else
+                            Console.WriteLine("An error occurred: " + innerEx.Message);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("An error occurred: " + e.Message);
+                }
             }
         }
     }

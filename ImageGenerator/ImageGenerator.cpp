@@ -109,7 +109,7 @@ void Backend::ProcessPixels_Custom(MyColor* array, int width, int height,
 			int ind = y * width + x;
 
 			auto newColor = getColor(normalized_x, normalized_y, array[ind]);
-			array[ind] = Lerp(array[ind], newColor, newColor.a);
+			array[ind] = Lerp(array[ind], newColor, (float)newColor.a / 255);
 
 			if ((float)(ind - lastReport) / size >= 0.01f)
 			{

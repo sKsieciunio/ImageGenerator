@@ -38,4 +38,24 @@ public class MyImage
         
         callback(1.0f);
     }
+
+    // this can throw!!!
+    public void Load(string filePath, NativeLibrary.TryReportCallback callback)
+    {
+        using (var image = Image.Load<Rgba32>(filePath))
+        {
+            TextureWidth = image.Width;
+            TextureHeight = image.Height;
+            Texture = new NativeLibrary.MyColor[TextureWidth * TextureHeight];
+            
+            for (int y = 0; y < TextureHeight; y++)
+            {
+                for (int x = 0; x < TextureWidth; x++)
+                {
+                    Rgba32 color = image[x, y];
+                    Texture[y * TextureWidth + x] = new NativeLibrary.MyColor { R = color.R, G = color.G, B = color.B, A = color.A };
+                }
+            } 
+        }
+    }
 }
