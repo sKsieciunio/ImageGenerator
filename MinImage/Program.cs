@@ -6,7 +6,7 @@ namespace MinImage;
     
 internal class Program
 {
-    static void Main()
+    static void Main(string[] args)
     {
         // var cmd1 = Parser.ParseCommand("generate 3 1024 1024"); 
         // var cmd2 = Parser.ParseCommand("generate 3 1024 1024 | blur 100 100 | output executor | blur 100 100 | output ");
@@ -14,7 +14,11 @@ internal class Program
         // var cmd4 = Parser.ParseCommand("generate 3 1024 1024 | input aaaa");
         // var cmd5 = Parser.ParseCommand("blur 100 100 | output executor");
        
-        // TODO: usage
+        if (args.Length > 0)
+        {
+            Console.WriteLine("Invalid usage: MinImage does not accept command line arguments.");
+            return;
+        }
         
         TerminalSession terminal = new();
         terminal.Run();

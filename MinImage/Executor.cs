@@ -145,7 +145,7 @@ public static class Executor
 
         if (linesToScroll > 0)
         {
-            for (int i = 0; i < linesToScroll; i++)
+            for (int i = 0; i < _imageCount; i++)
                 Console.WriteLine();
             cursorPosition.Top -= linesToScroll;
         }
