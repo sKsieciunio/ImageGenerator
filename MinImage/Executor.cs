@@ -11,11 +11,12 @@ public static class Executor
         public int TotalCommands;
         public int CurrentCommand;
         public float Progress;
-        public bool IsDone => CurrentCommand == TotalCommands;
+        public bool IsDone => CurrentCommand >= TotalCommands;
     }
 
     private static TaskProgress[] _taskProgress = new TaskProgress[0];
     private static int _imageCount;
+    private static bool _tooManyImages;
         
     public static void ExecuteCommandChain(List<Command> commandChain)
     {
@@ -49,7 +50,16 @@ public static class Executor
                 Progress = 0.0f
             };
         }
-
+        
+        // Ogółem to logika renderowania tych progress barów jest nieźle poroniona i już się poddałem żeby rozwiązywać
+        // edge case kiedy jest ich więcej niż wysokość konsoli. Pozdrawiam czytającego :)
+        _tooManyImages = false;
+        if (_imageCount >= Console.BufferHeight)
+        {
+            Console.WriteLine("Too many images to display progress bars. Alternative progress display will be used.");
+            _tooManyImages = true;
+        }
+        
         Parallel.For(0, _imageCount, (taskId) =>
         {
             NativeLibrary.TryReportCallback callback = CreateCallback(taskId);
@@ -77,8 +87,15 @@ public static class Executor
             }
         });
 
-        var cursorPosition = Console.GetCursorPosition();
-        Console.SetCursorPosition(0, cursorPosition.Top + _imageCount);
+        if (!_tooManyImages)
+        {
+            var cursorPosition = Console.GetCursorPosition();
+            Console.SetCursorPosition(0, cursorPosition.Top + _imageCount);
+        }
+        else
+        {
+            Console.SetCursorPosition(0, Console.CursorTop + 1);
+        }
     }
     
     private static NativeLibrary.TryReportCallback CreateCallback(int taskId)
@@ -88,14 +105,50 @@ public static class Executor
             _taskProgress[taskId].Progress = value;
 
             lock (_locker)
-                RenderProgress();
+                if (_tooManyImages)
+                    RenderProgressAlternative();
+                else
+                    RenderProgress();
             return true;
         };
+    }
+
+    private static void RenderProgressAlternative()
+    {
+        int blocks = 20;
+        int overallProgress = 0;
+        int howManyDone = 0;
+        for (int i = 0; i < _imageCount; i++)
+        {
+            overallProgress += _taskProgress[i].CurrentCommand;
+            if (_taskProgress[i].IsDone || (_taskProgress[i].CurrentCommand == _taskProgress[i].TotalCommands - 1 && _taskProgress[i].Progress >= 1.0f))
+                howManyDone++;
+        }
+        
+        float percentage = (float)overallProgress / (_imageCount * _taskProgress[0].TotalCommands); 
+        if (howManyDone == _imageCount)
+            percentage = 1.0f;
+       
+        Console.Write("["); 
+        Console.Write(new string('#', (int)(percentage * blocks)));
+        Console.Write(new string('-', blocks - (int)(percentage * blocks)));
+        Console.Write($"] {percentage*100:F0}% ({howManyDone}/{_imageCount})");
+        Console.WriteLine();
+        
+        Console.SetCursorPosition(0, Console.CursorTop - 1);
     }
 
     private static void RenderProgress()
     {   
         var cursorPosition = Console.GetCursorPosition();
+        int linesToScroll = _imageCount - (Console.BufferHeight - cursorPosition.Top) + 1;
+
+        if (linesToScroll > 0)
+        {
+            for (int i = 0; i < linesToScroll; i++)
+                Console.WriteLine();
+            cursorPosition.Top -= linesToScroll;
+        }
         
         for (int i = 0; i < _imageCount; i++)
         {

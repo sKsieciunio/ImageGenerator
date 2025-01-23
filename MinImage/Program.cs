@@ -13,7 +13,8 @@ internal class Program
         // var cmd3 = Parser.ParseCommand("");
         // var cmd4 = Parser.ParseCommand("generate 3 1024 1024 | input aaaa");
         // var cmd5 = Parser.ParseCommand("blur 100 100 | output executor");
-        
+       
+        // TODO: usage
         
         TerminalSession terminal = new();
         terminal.Run();
