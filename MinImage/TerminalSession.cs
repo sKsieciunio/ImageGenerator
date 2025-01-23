@@ -55,10 +55,25 @@ public class TerminalSession
 
     private void PrintHelp()
     {
-        // TODO: Complete the list of available commands
         Console.WriteLine("Available commands:");
-        Console.WriteLine("  generate <count> <width> <height>");
-        Console.WriteLine("  blur <radius> <passes>");
-        Console.WriteLine("  output <filename>"); 
+        Console.WriteLine("  Generative commands:");
+        Console.WriteLine("    generate <number of images> <width> <height>");
+        Console.WriteLine("    generatecheckerboard <number of images> <width> <height> <tilesX> <tilesY>");
+        Console.WriteLine("        tilesX and tilesY are optional, by default they are randomized");
+        Console.WriteLine("    generatelight <number of images> <width> <height>");
+        Console.WriteLine("    generatefractal <number of images> <width> <height>");
+        Console.WriteLine("    input <filePath>");
+        Console.WriteLine("  Processing commands:");
+        Console.WriteLine("    blur <w> <h>");
+        Console.WriteLine("    randomcircles <count> <radius>");
+        Console.WriteLine("        radius in number of pixels");
+        Console.WriteLine("    room <x1> <y1> <x2> <y2>");
+        Console.WriteLine("    colorcorrection <red> <green> <blue>");
+        Console.WriteLine("    gammacorrection <gamma>");
+        Console.WriteLine("    invert");
+        Console.WriteLine("    fancyshader");
+        Console.WriteLine("    sepia");
+        Console.WriteLine("  Output command:");
+        Console.WriteLine("    output <filePath>");
     }
 }

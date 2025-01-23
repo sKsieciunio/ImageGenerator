@@ -23,6 +23,9 @@ public static class Parser
         {
             "generate" => Command.CommandNameEnum.Generate,
             "input" => Command.CommandNameEnum.Input,
+            "generatecheckerboard" => Command.CommandNameEnum.GenerateCheckerboard,
+            "generatelight" => Command.CommandNameEnum.GenerateLight,
+            "generatefractal" => Command.CommandNameEnum.GenerateFractal,
             _ => throw new InvalidSyntaxException("Invalid syntax: first command must be generative type, see 'help' for more info.")
         };
         
@@ -42,7 +45,11 @@ public static class Parser
                 "colorcorrection" => Command.CommandNameEnum.ColorCorrection,
                 "gammacorrection" => Command.CommandNameEnum.GammaCorrection,
                 "output" => Command.CommandNameEnum.Output,
-                "generate" or "input" => throw new InvalidSyntaxException("Invalid syntax: generative type command must be the first command."),
+                "invert" => Command.CommandNameEnum.Invert,
+                "fancyshader" => Command.CommandNameEnum.FancyShader,
+                "sepia" => Command.CommandNameEnum.Sepia,
+                "generate" or "input" or "generatecheckerboard" or "generatelight" or "generatefractal"
+                    => throw new InvalidSyntaxException("Invalid syntax: generative type command must be the first command."),
                 _ => throw new InvalidSyntaxException("Invalid syntax: unknown command.")
             };
             

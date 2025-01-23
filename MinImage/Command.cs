@@ -7,6 +7,9 @@ public class Command
         Input,
         Generate,
         // 3 additional generating commands
+        GenerateCheckerboard,
+        GenerateLight,
+        GenerateFractal,
         
         Blur,
         RandomCircles,
@@ -14,6 +17,9 @@ public class Command
         ColorCorrection,
         GammaCorrection,
         // 3 additional processing commands
+        Invert,
+        FancyShader,
+        Sepia,
         
         Output
     }

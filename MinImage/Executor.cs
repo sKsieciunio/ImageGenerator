@@ -5,6 +5,7 @@ namespace MinImage;
 public static class Executor
 {
     private static object _locker = new object();
+    private static CancellationTokenSource _cts = new CancellationTokenSource();
 
     struct TaskProgress
     {
@@ -26,6 +27,9 @@ public static class Executor
         switch (commandChain[0].CommandName)
         {
             case Command.CommandNameEnum.Generate:
+            case Command.CommandNameEnum.GenerateCheckerboard:
+            case Command.CommandNameEnum.GenerateLight:
+            case Command.CommandNameEnum.GenerateFractal:
                 _imageCount = int.Parse(commandChain[0].Arguments[0]);
                 textureWidth = int.Parse(commandChain[0].Arguments[1]);
                 textureHeight = int.Parse(commandChain[0].Arguments[2]);
@@ -74,6 +78,22 @@ public static class Executor
                     case Command.CommandNameEnum.Generate:
                         NativeLibrary.GenerateImage(images[taskId], callback);
                         break;
+                    case Command.CommandNameEnum.GenerateCheckerboard:
+                        if (command.Arguments.Length == 5)
+                        {
+                            int tilesX = int.Parse(command.Arguments[3]);
+                            int tilesY = int.Parse(command.Arguments[4]);
+                            NativeLibrary.GenerateCheckerboard(images[taskId], tilesX, tilesY, callback);
+                        }
+                        else 
+                            NativeLibrary.GenerateCheckerboard(images[taskId], -1, -1, callback);
+                        break;
+                    case Command.CommandNameEnum.GenerateLight:
+                        NativeLibrary.GenerateLight(images[taskId], callback);
+                        break;
+                    case Command.CommandNameEnum.GenerateFractal:
+                        NativeLibrary.GenerateFractal(images[taskId], callback);
+                        break;
                     case Command.CommandNameEnum.Input:
                         images[taskId].Load(command.Arguments[0], callback);
                         break;
@@ -103,6 +123,15 @@ public static class Executor
                         float x2 = float.Parse(command.Arguments[2]);
                         float y2 = float.Parse(command.Arguments[3]);
                         NativeLibrary.Room(images[taskId], x1, y1, x2, y2, callback);
+                        break;
+                    case Command.CommandNameEnum.Invert:
+                        NativeLibrary.Invert(images[taskId], callback);
+                        break;
+                    case Command.CommandNameEnum.FancyShader:
+                        NativeLibrary.FancyShader(images[taskId], callback);
+                        break;
+                    case Command.CommandNameEnum.Sepia:
+                        NativeLibrary.Sepia(images[taskId], callback);
                         break;
                     case Command.CommandNameEnum.Output:
                         string savePath = "images/" + command.Arguments[0] + (_imageCount > 1 ? $"{taskId+1}.png" : ".png");
@@ -138,6 +167,7 @@ public static class Executor
                     RenderProgressAlternative();
                 else
                     RenderProgress();
+
             return true;
         };
     }
