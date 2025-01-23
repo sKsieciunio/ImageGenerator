@@ -197,7 +197,8 @@ void Backend::GammaCorrection(
 
 			if ((float)(ind - lastReport) / size >= 0.01f)
 			{
-				tryReportCallback((float)ind / size);
+				if (!tryReportCallback((float)ind / size))
+					return;
 				lastReport = ind;
 			}
 		}
@@ -309,7 +310,8 @@ void Backend::DrawCircles(MyColor* array, int width, int height,
 
 			if ((float)(ind - lastReport) / size >= 0.01f)
 			{
-				tryReportCallback((float)ind / size);
+				if (!tryReportCallback((float)ind / size))
+					return;
 				lastReport = ind;
 			}
 		}
@@ -336,7 +338,8 @@ void Backend::ColorCorrection(
 
 			if ((float)(ind - lastReport) / size >= 0.01f)
 			{
-				tryReportCallback((float)ind / size);
+				if (!tryReportCallback((float)ind / size))
+					return;
 				lastReport = ind;
 			}
 		}

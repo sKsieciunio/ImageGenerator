@@ -5,7 +5,7 @@ namespace MinImage;
 public static class Executor
 {
     private static object _locker = new object();
-    private static CancellationTokenSource _cts = new CancellationTokenSource();
+    private static CancellationTokenSource _cts;
 
     struct TaskProgress
     {
@@ -21,6 +21,8 @@ public static class Executor
         
     public static void ExecuteCommandChain(List<Command> commandChain)
     {
+        _cts = new CancellationTokenSource();
+        
         int textureWidth = 0;
         int textureHeight = 0;
 
@@ -66,6 +68,24 @@ public static class Executor
             Console.WriteLine("Too many images to display progress bars. Alternative progress display will be used.");
             _tooManyImages = true;
         }
+        
+        var cancellationToken = _cts.Token;
+        Task.Run(() =>
+        {
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                if (Console.KeyAvailable)
+                {
+                    var key = Console.ReadKey(intercept: true);
+                    if (key.Key == ConsoleKey.X)
+                    {
+                        _cts.Cancel();
+                        break;
+                    }
+                }
+                Thread.Sleep(100);
+            }
+        }, cancellationToken);
         
         Parallel.For(0, _imageCount, (taskId) =>
         {
@@ -160,6 +180,9 @@ public static class Executor
     {
         return (value) =>
         {
+            if (_cts.IsCancellationRequested)
+                return false;
+            
             _taskProgress[taskId].Progress = value;
 
             lock (_locker)
